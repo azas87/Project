@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="chatting.dao.ChattingMapper">
+	
+	<insert id="insertLog" parameterType="Log">
+		INSERT INTO LOG VALUES(#{logNo}, #{stdNo},#{action},#{result},#{logs},#{dates},#{time})
+	</insert>
+	
+	
+	
+	<select id="listLog" resultType="Log" >
+	
+		SELECT I.NAME, I.CLASS CLASS_NAME, I.ADMIN, I.GRANTS, L.ACTION, L.RESULT, L.LOGS, L.DATES, L.TIME FROM LOG L, INFO I WHERE L.STDNO = I.STDNO
+		
+	</select>
+	
+	
+	<!-- 
+	
+	<update id="updateUserAddr" parameterType="User">
+		UPDATE USERADDR SET PHONE=#{phone}, ADDRESS=#{address} WHERE ID=#{id}
+	</update>
+	
+	<delete id="deleteUserInfo" parameterType="String">
+		DELETE USERINFO WHERE ID = #{id}
+	</delete>
+	
+	<delete id="deleteUserAddr" parameterType="String">
+		DELETE USERADDR WHERE ID = #{id}
+	</delete>
+ -->
+	
+</mapper>
