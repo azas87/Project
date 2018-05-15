@@ -72,57 +72,7 @@ public class ChattingServerThread implements Runnable {
 						data.setUserList(list2);
 						broadCasting();
 						break;
-					case Data.CHAT_TREE:
-						JTree jt = new JTree(getNode(new File(ShareFolderPath)));
-						data.setJtree(jt);
-						userList.get(data.getId()).writeObject(data);
-						break;
-					case Data.FILE_CREATE:
-						file = new File(ShareFolderPath+data.getMessage());
-						if(!file.exists())
-						{
-							file.mkdirs();
-						}
-						break;
-					case Data.FILE_DELETE:
-						file = new File(ShareFolderPath+data.getMessage());
-						if(file.exists())
-						{
-							if(file.isDirectory())
-							{
-								delteAll(file);
-							}
-							
-							file.delete();
-						}
-					case Data.Log_ALL:
-						ChattingDAO dao = new ChattingDAO();
-						data.setLog(dao.listLogs());
-						userList.get(data.getId()).writeObject(data);
-						break;
-					case Data.FILE_ACCESS:
-						System.out.println("file_access");
-						data.setMessage(ShareFolderPath);
-						File file = new File(ShareFolderPath);
-						data.setFile(file.listFiles());
-						broadCasting();
-						break;
-					case Data.FILE_REQ:
-						System.out.println("file_req");
-						File f = new File(data.getMessage());
-						System.out.println(data.getMessage());
-						if(f.isDirectory())
-						{
-							data.setStatus(Data.FILE_ACCEPT);
-							data.setMessage(data.getMessage());
-							data.setFile(f.listFiles());
-							broadCasting();
-						}
-						else
-						{
-							System.out.println("파일 선택");
-						}
-						break;
+					
 				}
 			} catch (ClassNotFoundException e) {
 				System.out.println("000111100111");
@@ -138,19 +88,7 @@ public class ChattingServerThread implements Runnable {
 		System.out.println("chattingserver 스레드 종료");
 	} // run()
 	
-	public void delteAll(File file)
-	{
-		File list[] = file.listFiles();
-		for(File f : list)
-		{
-			if(f.isDirectory())
-			{
-				delteAll(f);
-			}
-			
-			f.delete();
-		}
-	}
+
 	
 	// 서버에 전달된 Data 객체를 접속한 모든 사용자에게 전파한다.
 	public void broadCasting() {
@@ -163,66 +101,7 @@ public class ChattingServerThread implements Runnable {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
-		
-//		for( Map.Entry<String, ObjectOutputStream> s : userList.entrySet() )
-//		{
-//			ObjectOutputStream oos = s.getValue();
-//			oos.writeObject(data);		
-//		}
-		
-	}
-	
-	private DefaultMutableTreeNode getNode(File file)
-	{
-		DefaultMutableTreeNode sub_root = new DefaultMutableTreeNode(file.getName());
-		
-		File list[] = file.listFiles();
-		DefaultMutableTreeNode temp = null;
-
-		// programfiles//windowsapps 같은 애들이 null 나옴.
-		// 관리자 권한이 없어서 못 보는 폴더네...
-		if(list == null || list.length == 0)	
-		{
-			temp = new DefaultMutableTreeNode("");
-			sub_root.add(temp);
-		}
-		else
-		{
-			ArrayList<File> folderList = new ArrayList<File>();
-			ArrayList<File> fileList = new ArrayList<File>();
-			
-			for(File f : list)
-			{
-				if(f.isDirectory())
-				{
-					folderList.add(f);
-				}
-				else if(f.isFile())
-				{
-					fileList.add(f);
-				}
-			}
-			
-			/*Collections.sort(folderList);
-			Collections.sort(fileList);*/
-			
-			for (int i = 0; i < folderList.size(); ++i) 
-			{
-				temp = getNode(folderList.get(i));
-				sub_root.add(temp);
-			}
-			
-			File tempFile;
-			for (int i = 0; i < fileList.size(); ++i) 
-			{
-				tempFile = fileList.get(i) ;
-				temp = new DefaultMutableTreeNode(tempFile.getName());
-				sub_root.add(temp);
-			}
-		}
-		
-		return sub_root;
+		}		
 	}
 	
 	public void closeAll(){
