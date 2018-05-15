@@ -31,6 +31,7 @@ import java.util.StringTokenizer;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -61,10 +62,13 @@ import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Label;
 import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableModel;
+
 import java.awt.GridLayout;
 import java.awt.TextField;
 import java.awt.Button;
 import javax.swing.BoxLayout;
+import javax.swing.JTable;
 
 public class TeacherChattingMain extends JFrame implements ActionListener, Runnable, MouseListener {
 
@@ -78,7 +82,7 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 	private JLabel lbl_count;
 	private JScrollPane scrollPane_1;
 	private JList li_userList;
-	private String name;
+	private String id;
 	
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
@@ -91,8 +95,8 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 	private JPanel panel_1;
 	private JPanel panel_2;
 	private JPanel panel_9;
-	private Button b_upload;
-	private Button b_download;
+	private JButton b_upload;
+	private JButton b_download;
 	private DefaultListModel content = new DefaultListModel();
 	private ArrayList<String> as = new ArrayList<String>();
 	private int count;
@@ -115,9 +119,9 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 	DefaultMutableTreeNode node;
 	public static JProgressBar progressbar;
 	public static JLabel lbl_per;
-	private String SEVER_IP = "127.0.0.1";
+//	private String SEVER_IP = "127.0.0.1";
 //	private String SEVER_IP = "203.233.196.50";
-//	private String SEVER_IP = "203.233.196.48";
+	private String SEVER_IP = "203.233.196.48";
 	
 	private FtpClientThread cst;
 	private JButton btn_cancel;
@@ -130,8 +134,14 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 	
 	private JScrollPane sp_userList;
 	
-
-
+	private JButton b_filelist;
+	private String file_access;
+	private String file_str;
+	private String contents [][];
+	private String header[];
+	private DefaultTableModel model;
+	private JScrollPane scrollPane_3;
+	private JTable table;
 	/**
 	 * Launch the application.
 	 */
@@ -140,9 +150,9 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 	/**
 	 * Create the frame.
 	 */
-	public TeacherChattingMain(String name) {
+	public TeacherChattingMain(String id) {
 		
-		this.name = name;
+		this.id = id;
 		setTitle("SCIT\uCC44\uD305(\uAD00\uB9AC\uC790)");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 616, 424);
@@ -230,11 +240,18 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 		lable_file.setHorizontalAlignment(SwingConstants.CENTER);
 		lable_file.setPreferredSize(new Dimension(120, 14));
 		
-		b_upload = new Button("\uC5C5\uB85C\uB4DC");
+		b_filelist = new JButton("\uD30C\uC77C\uBAA9\uB85D");
+		b_filelist.addActionListener(this);
+		panel_9.add(b_filelist, BorderLayout.WEST);
+		
+		b_upload = new JButton("\uD30C\uC77C\uC5C5\uB85C\uB4DC");
+		b_upload.setActionCommand("\uD30C\uC77C\uC5C5\uB85C\uB4DC");
+		b_upload.addActionListener(this);
 		panel_9.add(b_upload, BorderLayout.CENTER);
 		
-		b_download = new Button("\uB2E4\uC6B4\uB85C\uB4DC");
+		b_download = new JButton("\uB2E4\uC6B4\uB85C\uB4DC");
 		panel_9.add(b_download, BorderLayout.EAST);
+		b_download.addActionListener(this);
 		
 		panel_2 = new JPanel();
 		panel_2.setPreferredSize(new Dimension(100, 170));
@@ -267,18 +284,27 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 		panel_5.add(b_serch);
 		
 		scrollPane_2 = new JScrollPane();
-		scrollPane_2.setSize(new Dimension(350, 180));
+		scrollPane_2.setSize(new Dimension(200, 180));
 		scrollPane_2.setPreferredSize(new Dimension(11, 2));
 		scrollPane_2.setAutoscrolls(true);
 		scrollPane_2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane_2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		panel_2.add(scrollPane_2, BorderLayout.CENTER);
+		panel_2.add(scrollPane_2, BorderLayout.EAST);
 		list = new JList<String>();
+		
+				
+				
+				list.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				scrollPane_2.setViewportView(list);
+				
 
-		
-		
-		list.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		scrollPane_2.setViewportView(list);
+				
+				table = new JTable();
+				scrollPane_3 = new JScrollPane(table);
+				panel_2.add(scrollPane_3, BorderLayout.CENTER);
+				
+				
+				
 		setVisible(true);
 		connectServer();
 	
@@ -301,7 +327,7 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 			client = new Socket(SEVER_IP, 7777);
 			oos = new ObjectOutputStream(client.getOutputStream());
 			ois = new ObjectInputStream(client.getInputStream());
-			data = new Data(name, "님이 접속했습니다.", Data.CHAT_LOGIN);
+			data = new Data(id, "님이 접속했습니다.", Data.CHAT_LOGIN);
 			Thread t = new Thread(this);
 			t.start();
 
@@ -348,21 +374,32 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 		{	
 		String message1 = tf_chatInput.getText();
 		//ta_chatOutput.append("["+id+"]" + message1 +"\n");
-		data = new Data(name, message1, Data.CHAT_MESSAGE);
+		data = new Data(id, message1, Data.CHAT_MESSAGE);
 		sendData(data);
 		tf_chatInput.setText("");
 		}
+		else if(source == b_filelist)
+		{
+			data = new Data(id, null, null, Data.FILE_ACCESS);
+			sendData(data);
+		}
 		else if(source == b_upload)
 		{
-			
+			JFileChooser send = new JFileChooser();
+			send.showOpenDialog(this);
+			File file = send.getSelectedFile();
 		}
 		else if(source == b_download)
 		{
-			//str = "D:\\IT_MASTER";
-			str = "C:\\Users\\azas8\\Desktop\\매\\프로젝트_찬주\\Project2018_1";
-			System.out.println("getlist before");
-			getList();
-		}	
+			JFileChooser save = new JFileChooser();
+			save.showSaveDialog(this);
+			
+			if(save.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
+			{
+				System.out.println(save.getSelectedFile().toString());
+			}
+			File file = save.getSelectedFile();
+		}
 		
 		/*else if(source == mi_exit)
 		{
@@ -439,22 +476,23 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 			else
 			{
 				String message1 = tf_chatInput.getText();
-				data = new Data(name, message1, targetId, Data.CHAT_WHISPER); /****************/
+				data = new Data(id, message1, targetId, Data.CHAT_WHISPER); /****************/
 				sendData(data);
 			}	
 			tf_chatInput.requestFocus();
 		}
 		else if(source == b_log)
 		{
-			data = new Data(name, null, null, Data.Log_ALL); 
+			data = new Data(id, null, null, Data.Log_ALL); 
 			System.out.println(data.getId());
 			sendData(data);
+	
 		}
 		else if(source == b_serch)
 		{
 			
-		}	
-		/*
+		}
+		/* //트리용
 		else if( source == btn_create_folder )
 		{
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
@@ -485,10 +523,10 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 					
 					System.out.println(path);
 					
-					data = new Data(name, path+"test", Data.FILE_CREATE);
+					data = new Data(id, path+"test", Data.FILE_CREATE);
 					sendData(data);
 					
-					data = new Data(name, null, Data.CHAT_TREE);
+					data = new Data(id, null, Data.CHAT_TREE);
 					sendData(data);
 				}
 			}
@@ -528,10 +566,10 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 					
 					System.out.println(path);
 					
-					data = new Data(name, path, Data.FILE_DELETE);
+					data = new Data(id, path, Data.FILE_DELETE);
 					sendData(data);
 					
-					data = new Data(name, null, Data.CHAT_TREE);
+					data = new Data(id, null, Data.CHAT_TREE);
 					sendData(data);
 				}
 			}
@@ -541,6 +579,7 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 			}
 			
 		}
+		
 		else if( source == btn_download)
 		{
 			node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
@@ -557,6 +596,7 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 	    		ftpconnect(path.substring(0, path.length()-1),0);
 			}
 		}
+		*/
 		else if( source == btn_cancel)
 		{
 			FtpClientThread.isCancel = true;
@@ -564,37 +604,49 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 		else if( source == btn_logs)
 		{
 			System.out.println("1111");
-			data = new Data(name, null, Data.Log_ALL);
+			data = new Data(id, null, Data.Log_ALL);
 			sendData(data);
 		}
-		*/
+		
 	}
 
 	
 	
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
+	public void mouseClicked(MouseEvent e) 
+	{
 		if(e.getClickCount()==2)
 		{
 			if(file_list.getSelectedValue().equals(".."))
 			{
-				
-				str = new File(str).getParent();
+				String parent = "";
+				String [] path = file_str.split("\\\\"); //***파일에서 \\는 찾을 때 \를 기호로 인식하므로 \"처럼 \\\\써야함 
+				for(int i = 0 ; i < path.length-1 ; i++)
+				{
+					 parent += path[i] + "\\";
+				}
+				file_str = parent;
+				data = new Data(id, file_str, null, Data.FILE_REQ);
+				sendData(data);
 			}
 			else 
 			{
-
-				File file = new File(str+"\\"+file_list.getSelectedValue());
-				if(file.isDirectory())
+				//File file = new File(file_access+"\\"+li_fileList.getSelectedValue());
+				//System.out.println(file_str+li_fileList.getSelectedValue());
+				data = new Data(id, file_str+file_list.getSelectedValue(), null, Data.FILE_REQ);
+				sendData(data);
+				
+				/*if(file.isDirectory())
 				{
-					str += "\\"+file_list.getSelectedValue();
-				}	
+					file_access += "\\"+li_fileList.getSelectedValue();
+				}*/	
+			
 			}
-			getList();
+			//getList();
 		}
-		
+
 	}
+	
 	public void fileName(File f, int count)
 	{
 		
@@ -630,49 +682,49 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 	}
 	
 	
-	public void getList()
+	public void getList(File [] ff, String str_file)
 	{
-		File file = new File(str);
-		if(file.isDirectory())
-		{	
-			
-			String [] str = file.list();
-			File [] f = file.listFiles();
-			ArrayList<String> af = new ArrayList<String>();
-			ArrayList<String> ad = new ArrayList<String>();
-			
-			for(int i = 0 ; i < f.length ; i++)
+	
+		//String [] str = file.list();
+		//File [] f = file.listFiles();
+		
+		File [] f = ff;
+		
+		ArrayList<String> af = new ArrayList<String>();
+		ArrayList<String> ad = new ArrayList<String>();
+		
+		for(int i = 0 ; i < f.length ; i++)
+		{
+			if(f[i].isFile())
 			{
-				if(f[i].isFile())
-				{
-					af.add(f[i].getName());
-				}
-				else
-				{
-					ad.add(f[i].getName());
-				}	
+				af.add(f[i].getName());
 			}
-			Collections.sort(af);
-			Collections.sort(ad);
-			
-			content.clear();
-			if(!file.getAbsolutePath().equals("D:\\IT_MASTER"))
+			else
 			{
-				String back = "..";
-    			content.addElement(back);
-			}
-			
-			for(String ss : ad)
-			{
-				content.addElement(ss);
-			}
-			
-			for(String stt : af)
-			{
-				content.addElement(stt);
+				ad.add(f[i].getName());
 			}	
-			file_list.setModel(content);
 		}
+		Collections.sort(af);
+		Collections.sort(ad);
+		
+		content.clear();
+		
+		if(!str_file.equals(file_access))
+		{
+			String back = "..";
+			content.addElement(back);
+		}
+		
+		for(String ss : ad)
+		{
+			content.addElement(ss);
+		}
+		
+		for(String stt : af)
+		{
+			content.addElement(stt);
+		}	
+		file_list.setModel(content);
 	}
 
 	@Override
@@ -764,17 +816,34 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 											ta_chatOutput.append("["+data.getId()+"](귓말)"+data.getMessage()+"\n");
 											break;
 					case Data.Log_ALL : 
-										content.clear();
+										/*content.clear();
 										for(Log l : data.getLog())
 										{
-											/*logContent.addElement(String.format
-											 * ("%c반   %s   %s   %-20s   %s   %c   %-30s   %ty\n", 
-													l.getClass_name(), l.getName(), l.getAdmin(), 
-													l.getGrants(), l.getAction(), l.getResult(), 
-													l.getLogs(), l.getDates()));*/
+//											logContent.addElement(String.format
+//											 ("%c반   %s   %s   %-20s   %s   %c   %-30s   %ty\n", 
+//													l.getClass_name(), l.getName(), l.getAdmin(), 
+//													l.getGrants(), l.getAction(), l.getResult(), 
+//													l.getLogs(), l.getDates()));
 											logContent.addElement(l.toString());
 										}	
-										list.setModel(logContent);
+										list.setModel(logContent);*/
+						
+										String hh [] = {"1", "2", "3", "4", "5", "6", "7", "8"};
+										header = hh;
+										model = new DefaultTableModel(contents, header);
+										
+										ArrayList<Log> l = data.getLog();
+										contents = new String[l.size()][8];
+										
+										for(int i = 0 ; i < l.size() ; i++)
+										{
+											String [] s = l.get(i).toString().split(",");
+											contents[i] = s;
+										}	
+			
+										model = new DefaultTableModel(contents, header);
+										table.setModel(model);
+										
 										break;
 										
 				}	
