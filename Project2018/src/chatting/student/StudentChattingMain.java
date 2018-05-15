@@ -277,19 +277,31 @@ public class StudentChattingMain extends JFrame implements ActionListener, Runna
 			sendData(data);
 			tf_chatInput.setText("");
 		}
-		else if(source == b_download)
-		{
-			
-			str = "D:\\IT_MASTER";
-			//getList();
-		
-		}
 		else if( source == btn_filelist)
 		{
 			//System.out.println(id);
 			data = new Data(id, null, Data.CHAT_TREE);
 			sendData(data);
 		}
+		else if(source == b_upload)
+		{
+			JFileChooser send = new JFileChooser();
+			send.showOpenDialog(this);
+			File file = send.getSelectedFile();
+			//System.out.println(file.getName());
+		}	
+		else if(source == b_download)
+		{
+			JFileChooser save = new JFileChooser();
+			save.showSaveDialog(this);
+			
+			if(save.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
+			{
+				System.out.println(save.getSelectedFile().toString());
+			}
+			File file = save.getSelectedFile();
+		}
+		
 		/*
 		else if( source == mi_exit )
 		{
@@ -389,6 +401,7 @@ public class StudentChattingMain extends JFrame implements ActionListener, Runna
 			}
 			
 		}
+		/*// Æ®¸®¿ë
 		else if( source == btn_download)
 		{
 			node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
@@ -405,6 +418,7 @@ public class StudentChattingMain extends JFrame implements ActionListener, Runna
 	    		ftpconnect(path.substring(0, path.length()-1),0);
 			}
 		}
+		*/
 		else if( source == btn_cancel)
 		{
 			FtpClientThread.isCancel = true;
@@ -415,23 +429,7 @@ public class StudentChattingMain extends JFrame implements ActionListener, Runna
 			data = new Data(id, null, Data.Log_ALL);
 			sendData(data);
 		}
-		else if(source == b_filelist)
-		{
-			
-			//str = "D:\\IT_MASTER";
-			//getList();
-			data = new Data(id, null, null, Data.FILE_ACCESS);
-			System.out.println("b_filelist");
-			sendData(data);
-
-		}
-		else if(source == b_upload)
-		{
-			JFileChooser save = new JFileChooser();
-			save.showSaveDialog(this);
-			File file = save.getSelectedFile();
-			System.out.println(file.getName());
-		}	
+		
 	}
 	
 	
