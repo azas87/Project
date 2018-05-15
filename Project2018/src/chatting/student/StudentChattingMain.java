@@ -189,6 +189,7 @@ public class StudentChattingMain extends JFrame implements ActionListener, Runna
 		panel.add(b_download, BorderLayout.EAST);
 		
 		b_filelist = new JButton("\uD30C\uC77C\uBAA9\uB85D");
+		b_filelist.addActionListener(this);
 		panel.add(b_filelist, BorderLayout.WEST);
 		
 		sp_userList = new JScrollPane();
@@ -420,6 +421,7 @@ public class StudentChattingMain extends JFrame implements ActionListener, Runna
 			//str = "D:\\IT_MASTER";
 			//getList();
 			data = new Data(id, null, null, Data.FILE_ACCESS);
+			System.out.println("b_filelist");
 			sendData(data);
 
 		}
@@ -538,9 +540,11 @@ public class StudentChattingMain extends JFrame implements ActionListener, Runna
 				case Data.FILE_ACCEPT : 
 					getList(data.getFile(), data.getMessage());
 					file_str = data.getMessage();
+					System.out.println("file_accept " + data.getMessage());
 					break;
 				case Data.FILE_ACCESS : 
 					file_access = data.getMessage();
+					System.out.println("file_acccess " + data.getMessage());
 					data = new Data(id, file_access, null, Data.FILE_REQ);
 					sendData(data);
 					break;

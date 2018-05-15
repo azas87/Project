@@ -100,6 +100,29 @@ public class ChattingServerThread implements Runnable {
 						data.setLog(dao.listLogs());
 						userList.get(data.getId()).writeObject(data);
 						break;
+					case Data.FILE_ACCESS:
+						System.out.println("file_access");
+						data.setMessage(ShareFolderPath);
+						File file = new File(ShareFolderPath);
+						data.setFile(file.listFiles());
+						broadCasting();
+						break;
+					case Data.FILE_REQ:
+						System.out.println("file_req");
+						File f = new File(data.getMessage());
+						System.out.println(data.getMessage());
+						if(f.isDirectory())
+						{
+							data.setStatus(Data.FILE_ACCEPT);
+							data.setMessage(data.getMessage());
+							data.setFile(f.listFiles());
+							broadCasting();
+						}
+						else
+						{
+							System.out.println("파일 선택");
+						}
+						break;
 				}
 			} catch (ClassNotFoundException e) {
 				System.out.println("000111100111");
