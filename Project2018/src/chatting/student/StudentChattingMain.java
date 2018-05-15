@@ -64,7 +64,7 @@ import javax.swing.ScrollPaneConstants;
 
 public class StudentChattingMain extends JFrame implements ActionListener, Runnable, MouseListener 
 {
-
+	//찬주 테스트
 	private JPanel contentPane;
 	private JScrollPane sp_chatOutput;
 	private JTextArea ta_chatOutput;
