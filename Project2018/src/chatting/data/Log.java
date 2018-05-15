@@ -41,11 +41,7 @@ public class Log implements Serializable{
 		return String.format("%c¹Ý      %-7s     %-4s     %-20s    %s     %c    %-30s    y\n",
 				class_name, name, admin, grant_list, actionList[action], result, logs, dates );
 		
-		/*
-		return "Log [name=" + name + ", class_name=" + class_name + ", admin=" + admin + ", grant=" + grants
-				+ ", action=" + action + ", stdNo=" + stdNo + ", logNo=" + logNo + ", result=" + result + ", logs="
-				+ logs + ", dates=" + dates + ", time=" + time + "]";
-				*/
+
 	}
 	
 
