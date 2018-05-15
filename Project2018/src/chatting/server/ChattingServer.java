@@ -12,7 +12,7 @@ public class ChattingServer
 	{
 		try 
 		{
-			
+			//fdgfd
 			ServerSocket server = new ServerSocket(7777);
 			System.out.println("Chatting Server Start!!");
 			while(true)
