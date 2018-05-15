@@ -88,8 +88,8 @@ class Myframe10 extends JFrame implements ActionListener
 		{
 			String name = j2.getText();
 			this.dispose(); //화면에서 사라짐과 동시에 객체를 소멸시키는 메서드
-			new StudentChattingMain(name);
-			//new TeacherChattingMain(name);
+			//new StudentChattingMain(name);
+			new TeacherChattingMain(name);
 		}
 		else if(source==b2)
 		{	

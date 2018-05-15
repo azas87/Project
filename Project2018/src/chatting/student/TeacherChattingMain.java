@@ -66,6 +66,7 @@ import java.awt.GridLayout;
 import java.awt.TextField;
 import java.awt.Button;
 import javax.swing.BoxLayout;
+import javax.swing.JTable;
 
 public class TeacherChattingMain extends JFrame implements ActionListener, Runnable, MouseListener {
 
@@ -134,6 +135,8 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 	private JButton b_filelist;
 	private String file_access;
 	private String file_str;
+	private JTable table;
+	private JPanel panel_4;
 
 
 	/**
@@ -285,11 +288,17 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 		scrollPane_2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		panel_2.add(scrollPane_2, BorderLayout.CENTER);
 		list = new JList<String>();
-
 		
-		
-		list.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		scrollPane_2.setViewportView(list);
+				
+				
+				list.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				scrollPane_2.setViewportView(list);
+				
+				panel_4 = new JPanel();
+				panel_2.add(panel_4, BorderLayout.CENTER);
+				
+				table = new JTable();
+				panel_4.add(table);
 		setVisible(true);
 		connectServer();
 	
