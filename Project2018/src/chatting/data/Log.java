@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class Log implements Serializable{
 	private String name;
@@ -38,9 +39,10 @@ public class Log implements Serializable{
 			mask <<= 1;
 		}
 		
-		return String.format("%c¹Ý      %-7s     %-4s     %-20s    %s     %c    %-30s    y\n",
+		/*return String.format("%c¹Ý      %-7s     %-4s     %-20s    %s     %c    %-30s    y\n",
 				class_name, name, admin, grant_list, actionList[action], result, logs, dates );
-		
+		*/
+		return String.format("%c¹Ý,%s,%s,%s,%s,%c,%s,y", class_name, name, admin, grant_list, actionList[action], result, logs, dates);
 
 	}
 	

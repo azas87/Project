@@ -62,6 +62,8 @@ import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Label;
 import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableModel;
+
 import java.awt.GridLayout;
 import java.awt.TextField;
 import java.awt.Button;
@@ -117,9 +119,9 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 	DefaultMutableTreeNode node;
 	public static JProgressBar progressbar;
 	public static JLabel lbl_per;
-	private String SEVER_IP = "127.0.0.1";
+//	private String SEVER_IP = "127.0.0.1";
 //	private String SEVER_IP = "203.233.196.50";
-//	private String SEVER_IP = "203.233.196.48";
+	private String SEVER_IP = "203.233.196.48";
 	
 	private FtpClientThread cst;
 	private JButton btn_cancel;
@@ -135,10 +137,11 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 	private JButton b_filelist;
 	private String file_access;
 	private String file_str;
+	private String contents [][];
+	private String header[];
+	private DefaultTableModel model;
+	private JScrollPane scrollPane_3;
 	private JTable table;
-	private JPanel panel_4;
-
-
 	/**
 	 * Launch the application.
 	 */
@@ -281,12 +284,12 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 		panel_5.add(b_serch);
 		
 		scrollPane_2 = new JScrollPane();
-		scrollPane_2.setSize(new Dimension(350, 180));
+		scrollPane_2.setSize(new Dimension(200, 180));
 		scrollPane_2.setPreferredSize(new Dimension(11, 2));
 		scrollPane_2.setAutoscrolls(true);
 		scrollPane_2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane_2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		panel_2.add(scrollPane_2, BorderLayout.CENTER);
+		panel_2.add(scrollPane_2, BorderLayout.EAST);
 		list = new JList<String>();
 		
 				
@@ -294,11 +297,14 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 				list.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				scrollPane_2.setViewportView(list);
 				
-				panel_4 = new JPanel();
-				panel_2.add(panel_4, BorderLayout.CENTER);
+
 				
 				table = new JTable();
-				panel_4.add(table);
+				scrollPane_3 = new JScrollPane(table);
+				panel_2.add(scrollPane_3, BorderLayout.CENTER);
+				
+				
+				
 		setVisible(true);
 		connectServer();
 	
@@ -480,6 +486,7 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 			data = new Data(id, null, null, Data.Log_ALL); 
 			System.out.println(data.getId());
 			sendData(data);
+	
 		}
 		else if(source == b_serch)
 		{
@@ -809,17 +816,34 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 											ta_chatOutput.append("["+data.getId()+"](±Ó¸»)"+data.getMessage()+"\n");
 											break;
 					case Data.Log_ALL : 
-										content.clear();
+										/*content.clear();
 										for(Log l : data.getLog())
 										{
-											/*logContent.addElement(String.format
-											 * ("%c¹Ý   %s   %s   %-20s   %s   %c   %-30s   %ty\n", 
-													l.getClass_name(), l.getName(), l.getAdmin(), 
-													l.getGrants(), l.getAction(), l.getResult(), 
-													l.getLogs(), l.getDates()));*/
+//											logContent.addElement(String.format
+//											 ("%c¹Ý   %s   %s   %-20s   %s   %c   %-30s   %ty\n", 
+//													l.getClass_name(), l.getName(), l.getAdmin(), 
+//													l.getGrants(), l.getAction(), l.getResult(), 
+//													l.getLogs(), l.getDates()));
 											logContent.addElement(l.toString());
 										}	
-										list.setModel(logContent);
+										list.setModel(logContent);*/
+						
+										String hh [] = {"1", "2", "3", "4", "5", "6", "7", "8"};
+										header = hh;
+										model = new DefaultTableModel(contents, header);
+										
+										ArrayList<Log> l = data.getLog();
+										contents = new String[l.size()][8];
+										
+										for(int i = 0 ; i < l.size() ; i++)
+										{
+											String [] s = l.get(i).toString().split(",");
+											contents[i] = s;
+										}	
+			
+										model = new DefaultTableModel(contents, header);
+										table.setModel(model);
+										
 										break;
 										
 				}	
