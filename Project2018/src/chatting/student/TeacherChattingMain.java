@@ -1,11 +1,11 @@
 package chatting.student;
 
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.StringTokenizer;
 
-import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -40,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -47,28 +47,14 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import chatting.data.Data;
 import chatting.data.Log;
-
-import java.awt.FlowLayout;
-
-import javax.swing.DefaultListModel;
-import javax.swing.DropMode;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Component;
-import java.awt.ComponentOrientation;
-import java.awt.Label;
-import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableModel;
-
-import java.awt.GridLayout;
-import java.awt.TextField;
-import java.awt.Button;
-import javax.swing.BoxLayout;
-import javax.swing.JTable;
 
 public class TeacherChattingMain extends JFrame implements ActionListener, Runnable, MouseListener {
 
@@ -294,14 +280,20 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 		
 				
 				
-				list.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				scrollPane_2.setViewportView(list);
-				
-
-				
-				table = new JTable();
-				scrollPane_3 = new JScrollPane(table);
-				panel_2.add(scrollPane_3, BorderLayout.CENTER);
+		list.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		scrollPane_2.setViewportView(list);
+		
+	
+		
+		table = new JTable();
+		table.setAutoCreateRowSorter(true);
+		TableRowSorter tablesorter = new TableRowSorter(table.getModel());
+		table.setRowSorter(tablesorter);
+		scrollPane_3 = new JScrollPane(table);
+		
+		
+		
+		panel_2.add(scrollPane_3, BorderLayout.CENTER);
 				
 				
 				
@@ -615,6 +607,7 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 
 	public void mouseClicked(MouseEvent e) 
 	{
+		
 		if(e.getClickCount()==2)
 		{
 			if(file_list.getSelectedValue().equals(".."))
@@ -644,7 +637,6 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 			}
 			//getList();
 		}
-
 	}
 	
 	public void fileName(File f, int count)
@@ -842,7 +834,21 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 										}	
 			
 										model = new DefaultTableModel(contents, header);
+										
 										table.setModel(model);
+										
+										DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer();
+										cellRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+										TableColumnModel columnModel = table.getColumnModel();
+										for(int i = 0; i < columnModel.getColumnCount(); i++)
+										{
+											columnModel.getColumn(i).setCellRenderer(cellRenderer);
+										}
+										
+										// 크기 조절.
+										table.getColumn("4").setPreferredWidth(200);
+										table.getColumn("1").setPreferredWidth(30);
+										table.getColumn("3").setPreferredWidth(50);
 										
 										break;
 										
