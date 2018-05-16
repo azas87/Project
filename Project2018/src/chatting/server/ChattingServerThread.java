@@ -33,7 +33,7 @@ public class ChattingServerThread implements Runnable {
 		this.ois = ois;
 		this.oos = oos;
 	}
-	// 왜 푸시가 안 되지?
+
 	@Override
 	public void run() {
 		while( !exit )
