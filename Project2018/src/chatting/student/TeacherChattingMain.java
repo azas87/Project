@@ -107,7 +107,8 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 	public static JLabel lbl_per;
 //	private String SEVER_IP = "127.0.0.1";
 //	private String SEVER_IP = "203.233.196.50";
-	private String SEVER_IP = "203.233.196.48";
+//	private String SEVER_IP = "203.233.196.48";
+	private String SEVER_IP = "203.233.196.40";
 	
 	private FtpClientThread cst;
 	private JButton btn_cancel;
@@ -851,6 +852,17 @@ public class TeacherChattingMain extends JFrame implements ActionListener, Runna
 										table.getColumn("3").setPreferredWidth(50);
 										
 										break;
+					case Data.FILE_ACCEPT : 
+						getList(data.getFile(), data.getMessage());
+						file_str = data.getMessage();
+						System.out.println("file_accept " + data.getMessage());
+						break;
+					case Data.FILE_ACCESS : 
+						file_access = data.getMessage();
+						System.out.println("file_acccess " + data.getMessage());
+						data = new Data(id, file_access, null, Data.FILE_REQ);
+						sendData(data);
+						break;
 										
 				}	
 			} 

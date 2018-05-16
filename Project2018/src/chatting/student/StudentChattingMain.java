@@ -95,9 +95,10 @@ public class StudentChattingMain extends JFrame implements ActionListener, Runna
 	DefaultMutableTreeNode node;
 	public static JProgressBar progressbar;
 	public static JLabel lbl_per;
-	private String SEVER_IP = "127.0.0.1";
+//	private String SEVER_IP = "127.0.0.1";
 //	private String SEVER_IP = "203.233.196.50";
 //	private String SEVER_IP = "203.233.196.48";
+	private String SEVER_IP = "203.233.196.40";
 	
 	private FtpClientThread cst;
 	private JButton btn_cancel;
@@ -277,10 +278,10 @@ public class StudentChattingMain extends JFrame implements ActionListener, Runna
 			sendData(data);
 			tf_chatInput.setText("");
 		}
-		else if( source == btn_filelist)
+		else if( source == b_filelist)
 		{
-			//System.out.println(id);
-			data = new Data(id, null, Data.CHAT_TREE);
+			System.out.println("btn_filelist");
+			data = new Data(id, null, Data.FILE_ACCESS);
 			sendData(data);
 		}
 		else if(source == b_upload)
@@ -564,9 +565,15 @@ public class StudentChattingMain extends JFrame implements ActionListener, Runna
 			{
 				String parent = "";
 				String [] path = file_str.split("\\\\"); //***파일에서 \\는 찾을 때 \를 기호로 인식하므로 \"처럼 \\\\써야함 
-				for(int i = 0 ; i < path.length-1 ; i++)
+				/*for(int i = 0 ; i < path.length-1 ; i++)
 				{
 					 parent += path[i] + "\\";
+				}
+				file_str = parent;*/
+				parent = path[0];
+				for(int i = 1 ; i < path.length-1 ; i++)
+				{
+					 parent += ("\\" + path[i]);
 				}
 				file_str = parent;
 				data = new Data(id, file_str, null, Data.FILE_REQ);
@@ -575,8 +582,8 @@ public class StudentChattingMain extends JFrame implements ActionListener, Runna
 			else 
 			{
 				//File file = new File(file_access+"\\"+li_fileList.getSelectedValue());
-				System.out.println(file_str+li_fileList.getSelectedValue());
-				data = new Data(id, file_str+li_fileList.getSelectedValue(), null, Data.FILE_REQ);
+				System.out.println(file_str+"\\"+li_fileList.getSelectedValue());
+				data = new Data(id, file_str+"\\"+li_fileList.getSelectedValue(), null, Data.FILE_REQ);
 				sendData(data);
 				
 				/*if(file.isDirectory())
@@ -603,13 +610,26 @@ public class StudentChattingMain extends JFrame implements ActionListener, Runna
 		
 		for(int i = 0 ; i < f.length ; i++)
 		{
-			if(f[i].isFile())
+			if(f[i].isDirectory())
 			{
-				af.add(f[i].getName());
+				System.out.println("폴더");
+			}
+			else if(f[i].isFile())
+			{
+				System.out.println("파일");
 			}
 			else
 			{
+				System.out.println("기타");
+			}
+			
+			if(f[i].isDirectory())
+			{
 				ad.add(f[i].getName());
+			}
+			else
+			{
+				af.add(f[i].getName());
 			}	
 		}
 		Collections.sort(af);
