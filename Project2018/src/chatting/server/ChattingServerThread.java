@@ -4,15 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import chatting.dao.ChattingDAO;
 import chatting.data.Data;
@@ -23,25 +19,26 @@ public class ChattingServerThread implements Runnable {
 	private ObjectOutputStream oos;
 	private boolean exit;
 	private Data data;
-	//private String ShareFolderPath = "C:\\Program Files";
-	private String ShareFolderPath = "D:\\IT_MASTER\\";
-	
+	private int port;
 	private static HashMap<String, ObjectOutputStream> userList = new HashMap<>();
-	private File file;
+	private File path;
+	private String base_Path = "D:\\IT_Master";
+//	private File basePath = new File(base_Path);
 	
-	public ChattingServerThread(ObjectInputStream ois, ObjectOutputStream oos) {
+	public ChattingServerThread(ObjectInputStream ois, ObjectOutputStream oos, int port) {
 		this.ois = ois;
 		this.oos = oos;
+		this.port = port;
 	}
 
 	@Override
 	public void run() {
 		while( !exit )
 		{
-			try 
-			{
+			try {
 				data = (Data) ois.readObject();
 				int status = data.getStatus();
+				String targetId;
 				
 				switch( status )
 				{
@@ -55,13 +52,16 @@ public class ChattingServerThread implements Runnable {
 						data.setUserList(list);
 						broadCasting();
 						break;
+						
 					case Data.CHAT_MESSAGE:
 						broadCasting();
 						break;
+						
 					case Data.CHAT_WHISPER:
-						String targetId = data.getTargetId();
+						targetId = data.getTargetId();
 						userList.get(targetId).writeObject(data);
 						break;
+						
 					case Data.CHAT_LOGOUT:
 						userList.remove(data.getId());
 						Set<String> idList2 = userList.keySet();
@@ -73,22 +73,55 @@ public class ChattingServerThread implements Runnable {
 						broadCasting();
 						break;
 					
+					case Data.Log_ALL:
+						ChattingDAO d = new ChattingDAO();
+						data.setLog(d.listLogs());
+						broadCasting();
+						
+					case Data.FILE_UP:
+						data.setTargetId(port+"");
+						targetId = data.getId();
+						userList.get(targetId).writeObject(data);
+						break;
+						
+					case Data.FILE_DOWN:
+						path = new File(data.getMessage());
+						if( path.exists() )
+						{
+							data.setMessage("Y");
+							data.setTargetId(port+"");
+						}
+						targetId = data.getId();
+						userList.get(targetId).writeObject(data);
+						break;
+						
+					case Data.FILE_ACCESS:
+						path = new File(base_Path);
+						data.setFile(path.listFiles());
+						data.setMessage(base_Path);
+						broadCasting();
+						break;
+						
+					case Data.FILE_REQ:
+						path = new File(data.getMessage());
+						data.setStatus(Data.FILE_ACCEPT);
+						System.out.println("1111");
+						data.setFile(path.listFiles());
+						broadCasting();
+						//targetId = data.getId();
+						//userList.get(targetId).writeObject(data);
+						break;
+						
 				}
 			} catch (ClassNotFoundException e) {
-				System.out.println("000111100111");
 				e.printStackTrace();
 			} catch (IOException e) {
-				System.out.println("00000000000");
-				//e.printStackTrace();
-				userList.remove(data.getId());
+				e.printStackTrace();
 				exit = true;
-			}  
-		}// while
-		closeAll();
-		System.out.println("chattingserver 스레드 종료");
+			}
+		} // while
+		
 	} // run()
-	
-
 	
 	// 서버에 전달된 Data 객체를 접속한 모든 사용자에게 전파한다.
 	public void broadCasting() {
@@ -101,13 +134,8 @@ public class ChattingServerThread implements Runnable {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}		
+		}
 	}
+
 	
-	public void closeAll(){
-		System.out.println("모든 자원 종료");
-		try { if(ois != null) {oos.close(); }} catch (IOException e) {}
-		try { if(oos != null) {ois.close();}} catch (IOException e) {}
-		
-	}
 }
